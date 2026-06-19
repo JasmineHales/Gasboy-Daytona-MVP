@@ -70,6 +70,7 @@ type TransportScreenProps = {
   sections?: WorkflowSection[]
   defaultExpanded?: WorkflowSection | null
   vehicleProfile?: VehicleProfile
+  workflowFinishId?: 'transport' | 'vsa' | 'fuel'
   context: FlowContext
   onAction: (action: string, payload?: string) => void
   onMovementAction: (action: string, payload?: string) => void
@@ -86,6 +87,7 @@ export function TransportScreen({
   sections = DEFAULT_SECTIONS,
   defaultExpanded,
   vehicleProfile = TRANSPORT_VEHICLE,
+  workflowFinishId,
   context,
   onAction,
   onMovementAction,
@@ -95,6 +97,8 @@ export function TransportScreen({
   tutorial: tutorialConfig = TRANSPORT_TUTORIAL,
   forceTutorial = false,
 }: TransportScreenProps) {
+  const finishWorkflowId =
+    workflowFinishId ?? (title.toLowerCase() === 'vsa' ? 'vsa' : 'transport')
   const [expandedSection, setExpandedSection] = useState<WorkflowSection | null>(() =>
     initialExpanded(sections, defaultExpanded),
   )
@@ -208,7 +212,7 @@ export function TransportScreen({
   const handleComplete = () => {
     if (workflowReady && !completableSection) {
       setExpandedSection(null)
-      onAction('workflow-finish', title.toLowerCase() === 'vsa' ? 'vsa' : 'transport')
+      onAction('workflow-finish', finishWorkflowId)
       return
     }
 
@@ -228,7 +232,7 @@ export function TransportScreen({
 
     if (allAcknowledged) {
       setExpandedSection(null)
-      onAction('workflow-finish', title.toLowerCase() === 'vsa' ? 'vsa' : 'transport')
+      onAction('workflow-finish', finishWorkflowId)
       return
     }
 
@@ -549,46 +553,58 @@ export function TransportScreen({
               odometerRef,
             }}
           />
-          <AccordionGroup>
-            {sections.map((section, index) => {
-              const sectionOptional = isSectionOptional(
-                section,
-                sections,
-                sectionStatus,
-                fuelWorkflowContext,
-              )
-              const sectionAwaiting =
-                expandedSection !== section &&
-                !isSectionDisabled(section) &&
-                !sectionOptional &&
-                (sectionStatus[section] === 'not-started' ||
-                  sectionStatus[section] === 'in-progress' ||
-                  sectionStatus[section] === 'missing')
+          {sections.length === 1 ? (
+            <div
+              data-workflow-widget="section"
+              data-tutorial={sections[0]}
+              ref={(el) => {
+                sectionRefs.current[sections[0]] = el
+              }}
+            >
+              {renderSectionContent(sections[0])}
+            </div>
+          ) : (
+            <AccordionGroup>
+              {sections.map((section, index) => {
+                const sectionOptional = isSectionOptional(
+                  section,
+                  sections,
+                  sectionStatus,
+                  fuelWorkflowContext,
+                )
+                const sectionAwaiting =
+                  expandedSection !== section &&
+                  !isSectionDisabled(section) &&
+                  !sectionOptional &&
+                  (sectionStatus[section] === 'not-started' ||
+                    sectionStatus[section] === 'in-progress' ||
+                    sectionStatus[section] === 'missing')
 
-              return (
-                <AccordionSection
-                  key={section}
-                  title={SECTION_TITLES[section]}
-                  status={sectionStatus[section]}
-                  statusLabel={sectionOptional ? 'Optional' : undefined}
-                  chipVariant={sectionOptional ? 'optional' : 'default'}
-                  highlighted={sectionAwaiting}
-                  expanded={expandedSection === section}
-                  disabled={isSectionDisabled(section)}
-                  onToggle={() => toggleSection(section)}
-                  isLast={index === sections.length - 1}
-                  trackTag={`workflow.accordion.${section}`}
-                  headerTimerStartedAt={getSectionTimerStartedAt(section)}
-                  dataTutorial={section}
-                  sectionRef={(el) => {
-                    sectionRefs.current[section] = el
-                  }}
-                >
-                {renderSectionContent(section)}
-              </AccordionSection>
-              )
-            })}
-          </AccordionGroup>
+                return (
+                  <AccordionSection
+                    key={section}
+                    title={SECTION_TITLES[section]}
+                    status={sectionStatus[section]}
+                    statusLabel={sectionOptional ? 'Optional' : undefined}
+                    chipVariant={sectionOptional ? 'optional' : 'default'}
+                    highlighted={sectionAwaiting}
+                    expanded={expandedSection === section}
+                    disabled={isSectionDisabled(section)}
+                    onToggle={() => toggleSection(section)}
+                    isLast={index === sections.length - 1}
+                    trackTag={`workflow.accordion.${section}`}
+                    headerTimerStartedAt={getSectionTimerStartedAt(section)}
+                    dataTutorial={section}
+                    sectionRef={(el) => {
+                      sectionRefs.current[section] = el
+                    }}
+                  >
+                    {renderSectionContent(section)}
+                  </AccordionSection>
+                )
+              })}
+            </AccordionGroup>
+          )}
         </div>
       </main>
 
@@ -615,7 +631,7 @@ export function TransportScreen({
         onBack={tutorial.back}
         onSkip={tutorial.skip}
         trackPrefix={tutorialConfig.trackPrefix}
-        trackView={title.toLowerCase() === 'vsa' ? 'vsa' : 'transport'}
+        trackView={finishWorkflowId}
         trackScreen={context.screen}
       />
 

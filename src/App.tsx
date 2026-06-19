@@ -244,15 +244,13 @@ export default function App() {
       <a href="#main-content" className="fleet-sr-only">
         Skip to main content
       </a>
-      {import.meta.env.DEV && (
-        <FlowNavigator
-          activePageKey={activePageKey}
-          activeWidgetKey={resolvedWidgetKey}
-          workflowView={workflowView}
-          onSelectPage={handlePageSelect}
-          onSelectWidget={handleWidgetSelect}
-        />
-      )}
+      <FlowNavigator
+        activePageKey={activePageKey}
+        activeWidgetKey={resolvedWidgetKey}
+        workflowView={workflowView}
+        onSelectPage={handlePageSelect}
+        onSelectWidget={handleWidgetSelect}
+      />
       <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-[var(--color-hertz-page)] p-0 sm:p-3 md:p-4 lg:p-6">
         <div
           className="app-shell relative flex min-h-0 flex-1 flex-col overflow-hidden bg-white sm:max-w-xl sm:rounded-xl sm:shadow-lg md:max-w-2xl md:rounded-2xl lg:max-w-3xl xl:max-w-4xl"

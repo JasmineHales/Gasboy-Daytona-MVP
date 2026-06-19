@@ -27,7 +27,7 @@ export function FlowNavigator({
   return (
     <aside
       className="hidden w-64 shrink-0 overflow-y-auto border-r border-[var(--color-border-light)] bg-white p-3 md:block md:w-72 md:p-4 lg:w-80"
-      aria-label="Developer screen navigator"
+      aria-label="Transporter flow navigator"
     >
       <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">
         Transporter Flow
@@ -41,7 +41,7 @@ export function FlowNavigator({
           Page
         </h2>
         <p className="mb-2 text-[length:var(--text-ui-sm)] leading-snug text-[var(--color-text-muted)]">
-          Switch screens without resetting widget state.
+          Jump to any page in the prototype.
         </p>
         <div className="flex flex-col gap-1">
           {PAGE_NAV_ITEMS.map((item) => (
@@ -71,7 +71,7 @@ export function FlowNavigator({
           Widget state
         </h2>
         <p className="mb-3 text-[length:var(--text-ui-sm)] leading-snug text-[var(--color-text-muted)]">
-          Patch workflow widgets on the current page.
+          Set fuel, movement, stall, and cleaning states on the current workflow.
         </p>
         {workflowView == null ? (
           <p className="rounded-lg bg-[var(--color-surface-muted)] px-3 py-2 text-[length:var(--text-ui-sm)] text-[var(--color-text-muted)]">
